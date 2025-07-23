@@ -131,6 +131,7 @@
     <ClInclude Include="game.h" />
     <ClInclude Include="platform_common.h" />
     <ClInclude Include="renderer.h" />
+    <ClInclude Include="snake_mode.h" />
     <ClInclude Include="utils.h" />
     <ClInclude Include="win32_platform.h" />
   </ItemGroup>
@@ -139,6 +140,7 @@
     <ClCompile Include="game.cpp" />
     <ClCompile Include="platform_common.cpp" />
     <ClCompile Include="renderer.cpp" />
+    <ClCompile Include="snake_mode.cpp" />
     <ClCompile Include="utils.cpp" />
     <ClCompile Include="win32_platform.cpp" />
   </ItemGroup>

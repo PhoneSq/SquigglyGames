@@ -20,6 +20,7 @@ enum Gamemode {
     GM_MENU,
     GM_GAMEPLAY,
     GM_BREAKOUT,
+    GM_SNAKE,
 };
 
 // Game structures

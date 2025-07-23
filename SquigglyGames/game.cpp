@@ -1,5 +1,6 @@
 ﻿#include "game.h"
 #include "breakout_mode.h"
+#include "snake_mode.h"
 #include <stdlib.h>
 
 // Game variables definitions
@@ -283,6 +284,10 @@ simulate_game(Input* input, float dt)
 		else if (current_gamemode == GM_BREAKOUT)
 		{
 			simulate_breakout(input, dt);
+		}
+		else if (current_gamemode == GM_SNAKE)
+		{
+			simulate_snake(input, dt);
 		}
 		else
 		{
