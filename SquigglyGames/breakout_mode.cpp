@@ -93,18 +93,6 @@ void simulate_breakout(Input* input, float dt)
 
 	// Player movement
 	{
-		//float paddle_speed = 100.0f; // units per second
-		//float previous_paddle_p_x = paddle_p_x;
-		//if (is_down(BUTTON_LEFT))
-		//{
-		//	paddle_p_x -= paddle_speed * dt;
-		//}
-		//if (is_down(BUTTON_RIGHT))
-		//{
-		//	paddle_p_x += paddle_speed * dt;
-		//}
-		//paddle_dp_x = (paddle_p_x - previous_paddle_p_x) / dt;
-
 		float paddle_ddp = 0.f;
 		if (is_down(BUTTON_A)) paddle_ddp -= 1500.f;
 		if (is_down(BUTTON_D)) paddle_ddp += 1500.f;

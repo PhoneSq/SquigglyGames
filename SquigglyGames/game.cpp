@@ -293,11 +293,11 @@ simulate_game(Input* input, float dt)
 		{
 			if (pressed(BUTTON_UP))
 			{
-				hot_button = (hot_button + 2) % 3; // go left (wraps around)
+				hot_button = (hot_button + 3) % 4; // go left (wraps around)
 			}
 			if (pressed(BUTTON_DOWN))
 			{
-				hot_button = (hot_button + 1) % 3; // go right
+				hot_button = (hot_button + 1) % 4; // go right
 			}
 
 			if (pressed(BUTTON_ENTER))
@@ -315,6 +315,10 @@ simulate_game(Input* input, float dt)
 				else if (hot_button == 2)
 				{
 					current_gamemode = GM_BREAKOUT;
+				}
+				else if (hot_button == 3)
+				{
+					current_gamemode = GM_SNAKE;
 				}
 			}
 
@@ -336,16 +340,20 @@ simulate_game(Input* input, float dt)
 			//	//draw_rect(20, 0, 10, 10, 0xFF0BF100);
 			//	//draw_rect(-20, 0, 10, 10, 0xFF1BD86E);
 			//}
-			draw_text("SIGLE PLAYER", -60, 10, 1, hot_button == 0 ? 0xFFFFFFFF : 0xFF0BF100);
-			draw_text("PLAY WITH AI", -60, 0, .5, hot_button == 0 ? 0xFFFFFFFF : 0xFF0BF100);
-
-			draw_text("MULTIPLAYER", -60, -10, 1, hot_button == 1 ? 0xFFFFFFFF : 0xFF0BF100);
-			draw_text("PLAY WITH FRIEND", -60, -20, .5, hot_button == 1 ? 0xFFFFFFFF : 0xFF0BF100);
-
-			draw_text("BREAKOUT", -60, -30, 1, hot_button == 2 ? 0xFFFFFFFF : 0xFF0BF100);
-			draw_text("BRICK BREAKER MODE", -60, -40, .5, hot_button == 2 ? 0xFFFFFFFF : 0xFF0BF100);
 
 			draw_text("PONG GAME", -55, 40, 2, 0xFF0BF100);
 			draw_text("PROGRAMMED BY SQUIGGLY", -75, 20, .5, 0xFF0BF100);
+
+			draw_text("SIGLE PLAYER", -60, 15, .8, hot_button == 0 ? 0xFFFFFFFF : 0xFF0BF100);
+			draw_text("PLAY WITH AI", -60, 8, .3, hot_button == 0 ? 0xFFFFFFFF : 0xFF0BF100);
+
+			draw_text("MULTIPLAYER", -60, 2, .8, hot_button == 1 ? 0xFFFFFFFF : 0xFF0BF100);
+			draw_text("PLAY WITH FRIEND", -60, -5, .3, hot_button == 1 ? 0xFFFFFFFF : 0xFF0BF100);
+
+			draw_text("BREAKOUT", -60, -11, .8, hot_button == 2 ? 0xFFFFFFFF : 0xFF0BF100);
+			draw_text("BRICK BREAKER MODE", -60, -18, .3, hot_button == 2 ? 0xFFFFFFFF : 0xFF0BF100);
+
+			draw_text("SNAKE MODE", -60, -24, .8, hot_button == 3 ? 0xFFFFFFFF : 0xFF0BF100);
+			draw_text("CLASSIC RETRO SNAKE", -60, -31, .3, hot_button == 3 ? 0xFFFFFFFF : 0xFF0BF100);
 		}
 }
