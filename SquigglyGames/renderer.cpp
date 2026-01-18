@@ -433,3 +433,157 @@ draw_number(int number, float x, float y, float size, u32 color)
 		}
 	}
 }
+
+ void draw_circle(float x, float y, float radius, u32 color)
+ {
+	 // Convert center and radius from scaled float coords to pixel coords
+	 int cx = (int)(x * render_state.height * render_scale + render_state.width / 2.f);
+	 int cy = (int)(y * render_state.height * render_scale + render_state.height / 2.f);
+	 int r = (int)(radius * render_state.height * render_scale);
+
+	 int x_offset = 0;
+	 int y_offset = r;
+	 int d = 1 - r;
+
+	 auto plot_circle_points = [&](int xc, int yc, int x, int y) {
+		 draw_pixel(xc + x, yc + y, color);
+		 draw_pixel(xc - x, yc + y, color);
+		 draw_pixel(xc + x, yc - y, color);
+		 draw_pixel(xc - x, yc - y, color);
+		 draw_pixel(xc + y, yc + x, color);
+		 draw_pixel(xc - y, yc + x, color);
+		 draw_pixel(xc + y, yc - x, color);
+		 draw_pixel(xc - y, yc - x, color);
+		 };
+
+	 while (x_offset <= y_offset)
+	 {
+		 plot_circle_points(cx, cy, x_offset, y_offset);
+
+		 if (d < 0)
+		 {
+			 d += 2 * x_offset + 3;
+		 }
+		 else
+		 {
+			 d += 2 * (x_offset - y_offset) + 5;
+			 y_offset--;
+		 }
+		 x_offset++;
+	 }
+ }
+
+ void draw_filled_circle(float x, float y, float radius, u32 color)
+ {
+	 int cx = (int)(x * render_state.height * render_scale + render_state.width / 2.f);
+	 int cy = (int)(y * render_state.height * render_scale + render_state.height / 2.f);
+	 int r = (int)(radius * render_state.height * render_scale);
+
+	 int x_offset = 0;
+	 int y_offset = r;
+	 int d = 1 - r;
+
+	 auto draw_horizontal_line = [&](int y_line, int x_start, int x_end) {
+		 if (y_line < 0 || y_line >= render_state.height) return;
+
+		 if (x_start < 0) x_start = 0;
+		 if (x_end >= render_state.width) x_end = render_state.width - 1;
+
+		 u32* pixel = (u32*)render_state.memory + y_line * render_state.width + x_start;
+		 for (int x = x_start; x <= x_end; ++x)
+		 {
+			 *pixel++ = color;
+		 }
+		 };
+
+	 while (x_offset <= y_offset)
+	 {
+		 draw_horizontal_line(cy + y_offset, cx - x_offset, cx + x_offset);
+		 draw_horizontal_line(cy - y_offset, cx - x_offset, cx + x_offset);
+		 draw_horizontal_line(cy + x_offset, cx - y_offset, cx + y_offset);
+		 draw_horizontal_line(cy - x_offset, cx - y_offset, cx + y_offset);
+
+		 if (d < 0)
+		 {
+			 d += 2 * x_offset + 3;
+		 }
+		 else
+		 {
+			 d += 2 * (x_offset - y_offset) + 5;
+			 y_offset--;
+		 }
+		 x_offset++;
+	 }
+ }
+
+ inline void draw_pixel(int px, int py, u32 color)
+ {
+	 if (px >= 0 && px < render_state.width &&
+		 py >= 0 && py < render_state.height)
+	 {
+		 u32* pixel = (u32*)render_state.memory;
+		 pixel[py * render_state.width + px] = color;
+	 }
+ }
+
+ void draw_line(float x0, float y0, float x1, float y1, float half_size, u32 color)
+ {
+	 // Convert logical coordinates to pixel space
+	 float scale = render_state.height * render_scale;
+
+	 x0 = x0 * scale + render_state.width / 2.0f;
+	 y0 = y0 * scale + render_state.height / 2.0f;
+	 x1 = x1 * scale + render_state.width / 2.0f;
+	 y1 = y1 * scale + render_state.height / 2.0f;
+
+	 float dx = x1 - x0;
+	 float dy = y1 - y0;
+	 float length = sqrtf(dx * dx + dy * dy);
+	 if (length == 0) return;
+
+	 // Normalize direction vector
+	 float nx = dx / length;
+	 float ny = dy / length;
+
+	 // Perpendicular vector
+	 float px = -ny * half_size * scale;
+	 float py = nx * half_size * scale;
+
+	 // 4 corners of the rectangle (line with thickness)
+	 int x_points[4] = {
+		 (int)(x0 + px), (int)(x1 + px),
+		 (int)(x1 - px), (int)(x0 - px)
+	 };
+	 int y_points[4] = {
+		 (int)(y0 + py), (int)(y1 + py),
+		 (int)(y1 - py), (int)(y0 - py)
+	 };
+
+	 // Bounding box and draw it using 2 triangles or simple scanline fill
+	 // For now, a hacky way using min/max box
+	 int min_x = *std::min_element(x_points, x_points + 4);
+	 int max_x = *std::max_element(x_points, x_points + 4);
+	 int min_y = *std::min_element(y_points, y_points + 4);
+	 int max_y = *std::max_element(y_points, y_points + 4);
+
+	 for (int y = min_y; y <= max_y; y++)
+	 {
+		 for (int x = min_x; x <= max_x; x++)
+		 {
+			 // Dot test to see if pixel is within the line shape
+			 float px = x - x0;
+			 float py = y - y0;
+			 float proj = (px * dx + py * dy) / (length * length);
+			 if (proj < 0 || proj > 1) continue;
+
+			 float closest_x = x0 + proj * dx;
+			 float closest_y = y0 + proj * dy;
+			 float dist_x = x - closest_x;
+			 float dist_y = y - closest_y;
+			 float dist2 = dist_x * dist_x + dist_y * dist_y;
+
+			 if (dist2 <= (half_size * scale) * (half_size * scale))
+				 draw_pixel(x, y, color);
+		 }
+	 }
+ }
